@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Xtranslater",
-  "version": "1.2.0",
-  "description": "Traducción flotante instantánea, reemplazo de texto, historial y lectura de voz.",
+  "version": "1.3.0",
+  "description": "Traducción flotante instantánea, reemplazo de texto en tiempo real, historial local y lectura por voz.",
   "permissions": [
     "storage",
     "activeTab"
