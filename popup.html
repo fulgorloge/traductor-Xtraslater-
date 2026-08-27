@@ -3,23 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      width: 280px;
+      width: 320px;
       background: #09090b;
       color: #f4f4f5;
-      font-family: system-ui, -apple-system, sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       padding: 14px;
-      margin: 0;
     }
-    h3 {
-      font-size: 14px;
-      margin-bottom: 10px;
+    .header {
       display: flex;
       align-items: center;
-      gap: 6px;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #27272a;
+    }
+    h3 { font-size: 13px; font-weight: 600; }
+    .badge {
+      background: #2563eb;
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
     }
     .history-list {
-      max-height: 200px;
+      max-height: 240px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
@@ -28,60 +38,35 @@
     .history-item {
       background: #18181b;
       border: 1px solid #27272a;
-      border-radius: 6px;
-      padding: 8px;
+      border-radius: 8px;
+      padding: 10px;
       font-size: 11px;
     }
-    .history-orig { color: #a1a1aa; margin-bottom: 2px; }
-    .history-trans { color: #3b82f6; font-weight: 600; }
-    .empty { color: #71717a; font-size: 12px; text-align: center; padding: 10px 0; }
+    .history-orig { color: #a1a1aa; margin-bottom: 4px; word-break: break-word; }
+    .history-trans { color: #60a5fa; font-weight: 600; word-break: break-word; }
+    .empty { color: #71717a; font-size: 12px; text-align: center; padding: 24px 0; }
     button.clear-btn {
       width: 100%;
-      margin-top: 10px;
-      background: #27272a;
+      margin-top: 12px;
+      background: #18181b;
       color: #f4f4f5;
-      border: none;
-      padding: 6px;
+      border: 1px solid #27272a;
+      padding: 7px;
       border-radius: 6px;
       cursor: pointer;
       font-size: 11px;
     }
-    button.clear-btn:hover { background: #3f3f46; }
+    button.clear-btn:hover { background: #27272a; border-color: #3f3f46; }
   </style>
 </head>
 <body>
-  <h3>🌐 Historial Reciente</h3>
+  <div class="header">
+    <h3>Xtranslater</h3>
+    <span class="badge">v1.4.0</span>
+  </div>
   <div id="historyContainer" class="history-list"></div>
   <button id="clearBtn" class="clear-btn">Limpiar Historial</button>
 
-  <script>
-    const container = document.getElementById('historyContainer');
-    const clearBtn = document.getElementById('clearBtn');
-
-    function loadHistory() {
-      chrome.storage.local.get({ history: [] }, (res) => {
-        if (res.history.length === 0) {
-          container.innerHTML = '<div class="empty">Sin traducciones recientes</div>';
-          return;
-        }
-        container.innerHTML = res.history.map(item => `
-          <div class="history-item">
-            <div class="history-orig">${escapeHtml(item.original)}</div>
-            <div class="history-trans">${escapeHtml(item.translated)}</div>
-          </div>
-        `).join('');
-      });
-    }
-
-    function escapeHtml(text) {
-      return text.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
-    }
-
-    clearBtn.addEventListener('click', () => {
-      chrome.storage.local.set({ history: [] }, loadHistory);
-    });
-
-    loadHistory();
-  </script>
+  <script src="popup.js"></script>
 </body>
 </html>
