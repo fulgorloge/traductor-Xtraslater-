@@ -1,30 +1,42 @@
 {
   "manifest_version": 3,
   "name": "Xtranslater",
-  "version": "1.0",
-  "description": "Traducción de texto instantánea, lectura de voz y atajo de teclado al estilo QTranslate",
-  "permissions": [
-    "activeTab",
-    "scripting",
-    "storage",
-    "tts"
-  ],
-  "action": {
-    "default_popup": "popup.html"
+  "version": "1.1.0",
+  "description": "Traducción rápida de texto flotante, múltiples motores, lectura en voz alta y atajos personalizados.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
   },
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://translate.googleapis.com/*",
+    "https://api.mymemory.translated.net/*"
+  ],
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"]
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_end"
     }
   ],
   "commands": {
-    "translate-selection": {
+    "_execute_action": {
       "suggested_key": {
-        "default": "Ctrl+Q",
-        "mac": "Command+Q"
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
       },
-      "description": "Traducir texto seleccionado"
+      "description": "Abrir la interfaz de Xtranslater"
     }
+  },
+  "action": {
+    "default_title": "Xtranslater"
   }
 }
