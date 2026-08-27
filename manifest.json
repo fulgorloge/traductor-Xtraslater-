@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Xtranslater",
+  "version": "1.0",
+  "description": "Traducción de texto instantánea, lectura de voz y atajo de teclado al estilo QTranslate",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "tts"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "commands": {
+    "translate-selection": {
+      "suggested_key": {
+        "default": "Ctrl+Q",
+        "mac": "Command+Q"
+      },
+      "description": "Traducir texto seleccionado"
+    }
+  }
+}
