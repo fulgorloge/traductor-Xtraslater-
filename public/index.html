@@ -3,77 +3,223 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Xtranslater - Centro de Descarga y Carga</title>
+  <title>Xtranslater - Extensión de Traducción Profesional</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f9;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
+    :root {
+      --bg: #09090b;
+      --card-bg: #18181b;
+      --card-border: #27272a;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --text: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --success: #22c55e;
+      --error: #ef4444;
     }
-    .card {
-      background: white;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      width: 350px;
-      text-align: center;
-    }
-    h2 { color: #333; margin-bottom: 20px; }
-    .btn {
-      display: block;
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: none;
-      border-radius: 5px;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
+
+    * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      border-radius: 16px;
+      font-size: 28px;
+      margin-bottom: 12px;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
       text-decoration: none;
     }
-    .btn-download { background-color: #28a745; color: white; }
-    .btn-download:hover { background-color: #218838; }
-    .btn-upload { background-color: #007bff; color: white; }
-    .btn-upload:hover { background-color: #0069d9; }
+
+    .btn-download {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-download:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .features {
+      margin: 20px 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .feature-item {
+      background: #27272a50;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--card-border);
+      margin: 20px 0;
+    }
+
+    .upload-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--text-muted);
+    }
+
+    .input-group {
+      margin-bottom: 12px;
+    }
+
     input[type="password"], input[type="file"] {
       width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-      box-sizing: border-box;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    .upload-section {
-      margin-top: 20px;
-      border-top: 1px solid #eee;
-      padding-top: 15px;
-    }
-    #statusMessage {
-      margin-top: 10px;
+      background: #09090b;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 8px;
       font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="password"]:focus {
+      border-color: var(--accent);
+    }
+
+    input[type="file"]::file-selector-button {
+      background: var(--card-border);
+      color: var(--text);
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 8px;
+    }
+
+    .btn-upload {
+      background: #27272a;
+      color: var(--text);
+      border: 1px solid var(--card-border);
+    }
+
+    .btn-upload:hover {
+      background: #3f3f46;
+    }
+
+    #statusMessage {
+      margin-top: 12px;
+      font-size: 13px;
+      text-align: center;
+      min-height: 18px;
     }
   </style>
 </head>
 <body>
 
-  <div class="card">
-    <h2>Xtranslater Panel</h2>
+  <div class="container">
+    <div class="header">
+      <div class="logo-badge">🌐</div>
+      <h1>Xtranslater</h1>
+      <p class="subtitle">Traducción rápida, motores múltiples y voz en tiempo real</p>
+    </div>
 
-    <!-- Botón de Descarga Pública -->
-    <a href="/api/download" class="btn btn-download">📥 Descargar Extensión (.zip)</a>
+    <div class="card">
+      <a href="/api/download" class="btn btn-download">
+        📥 Descargar Última Versión
+      </a>
 
-    <!-- Sección de Subida Protegida -->
-    <div class="upload-section">
-      <h3>Subir Nueva Versión</h3>
+      <div class="features">
+        <div class="feature-item">⚡ Selección instantánea</div>
+        <div class="feature-item">🔊 Text-to-Speech</div>
+        <div class="feature-item">🔄 Múltiples Motores</div>
+        <div class="feature-item">⌨️ Atajo Alt + T</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="upload-title">Panel de Administración</div>
       <form id="uploadForm">
-        <input type="password" id="passwordInput" placeholder="Contraseña de administrador" required>
-        <input type="file" id="fileInput" accept=".zip" required>
-        <button type="submit" class="btn btn-upload">📤 Subir Archivo</button>
+        <div class="input-group">
+          <input type="password" id="passwordInput" placeholder="Contraseña requerida" required>
+        </div>
+        <div class="input-group">
+          <input type="file" id="fileInput" accept=".zip,.rar" required>
+        </div>
+        <button type="submit" class="btn btn-upload">📤 Subir Nueva Versión</button>
       </form>
       <div id="statusMessage"></div>
     </div>
@@ -88,8 +234,8 @@
       const statusMessage = document.getElementById('statusMessage');
 
       if (!fileInput.files[0]) {
-        statusMessage.style.color = 'red';
-        statusMessage.innerText = 'Por favor selecciona un archivo .zip';
+        statusMessage.style.color = 'var(--error)';
+        statusMessage.innerText = 'Selecciona un archivo comprimido (.zip o .rar)';
         return;
       }
 
@@ -97,8 +243,8 @@
       formData.append('password', password);
       formData.append('extensionZip', fileInput.files[0]);
 
-      statusMessage.style.color = '#333';
-      statusMessage.innerText = 'Subiendo...';
+      statusMessage.style.color = 'var(--text-muted)';
+      statusMessage.innerText = 'Subiendo paquete...';
 
       try {
         const response = await fetch('/api/upload', {
@@ -109,16 +255,16 @@
         const data = await response.json();
 
         if (response.ok) {
-          statusMessage.style.color = 'green';
+          statusMessage.style.color = 'var(--success)';
           statusMessage.innerText = data.message;
           document.getElementById('uploadForm').reset();
         } else {
-          statusMessage.style.color = 'red';
-          statusMessage.innerText = data.error || 'Error al subir el archivo.';
+          statusMessage.style.color = 'var(--error)';
+          statusMessage.innerText = data.error || 'Error al subir la actualización.';
         }
       } catch (error) {
-        statusMessage.style.color = 'red';
-        statusMessage.innerText = 'Error de conexión con el servidor.';
+        statusMessage.style.color = 'var(--error)';
+        statusMessage.innerText = 'Error de comunicación con el servidor.';
       }
     });
   </script>
