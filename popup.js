@@ -1,56 +1,107 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const translateBtn = document.getElementById('translateBtn');
-  const ttsBtn = document.getElementById('ttsBtn');
-  const sourceText = document.getElementById('sourceText');
-  const targetLang = document.getElementById('targetLang');
-  const engine = document.getElementById('engine');
-  const resultText = document.getElementById('resultText');
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      width: 300px;
+      background: #09090b;
+      color: #f4f4f5;
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 14px;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #27272a;
+    }
+    h3 {
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .badge {
+      background: #2563eb;
+      color: #fff;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .history-list {
+      max-height: 220px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .history-item {
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 11px;
+    }
+    .history-orig { color: #a1a1aa; margin-bottom: 3px; word-break: break-word; }
+    .history-trans { color: #60a5fa; font-weight: 600; word-break: break-word; }
+    .empty { color: #71717a; font-size: 12px; text-align: center; padding: 16px 0; }
+    button.clear-btn {
+      width: 100%;
+      margin-top: 12px;
+      background: #27272a;
+      color: #f4f4f5;
+      border: 1px solid #3f3f46;
+      padding: 6px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    button.clear-btn:hover { background: #3f3f46; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h3>Xtranslater</h3>
+    <span class="badge">v1.3.0</span>
+  </div>
+  <div id="historyContainer" class="history-list"></div>
+  <button id="clearBtn" class="clear-btn">Limpiar Historial</button>
 
-  async function performTranslation() {
-    const text = sourceText.value.trim();
-    const lang = targetLang.value;
-    const selectedEngine = engine.value;
+  <script>
+    const container = document.getElementById('historyContainer');
+    const clearBtn = document.getElementById('clearBtn');
 
-    if (!text) {
-      resultText.innerText = "Por favor ingresa un texto.";
-      return;
+    function loadHistory() {
+      chrome.storage.local.get({ history: [] }, (res) => {
+        if (!res.history || res.history.length === 0) {
+          container.innerHTML = '<div class="empty">Sin traducciones recientes</div>';
+          return;
+        }
+        container.innerHTML = res.history.map(item => `
+          <div class="history-item">
+            <div class="history-orig">${escapeHtml(item.original)}</div>
+            <div class="history-trans">${escapeHtml(item.translated)}</div>
+          </div>
+        `).join('');
+      });
     }
 
-    resultText.innerText = "Traduciendo...";
-
-    try {
-      let translated = "";
-      if (selectedEngine === "google") {
-        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${lang}&dt=t&q=${encodeURIComponent(text)}`;
-        const res = await fetch(url);
-        const data = await res.json();
-        translated = data[0].map(item => item[0]).join('');
-      } else if (selectedEngine === "mymemory") {
-        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=auto|${lang}`;
-        const res = await fetch(url);
-        const data = await res.json();
-        translated = data.responseData.translatedText;
-      }
-      resultText.innerText = translated;
-    } catch (error) {
-      resultText.innerText = "Error al conectar con el servidor de traducción.";
+    function escapeHtml(text) {
+      return text.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
     }
-  }
 
-  function playAudio() {
-    const text = resultText.innerText;
-    if (!text || text === "Traduciendo..." || text === "Esperando texto...") return;
+    clearBtn.addEventListener('click', () => {
+      chrome.storage.local.set({ history: [] }, loadHistory);
+    });
 
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = targetLang.value;
-      window.speechSynthesis.speak(utterance);
-    } else {
-      alert("Tu navegador no soporta síntesis de voz.");
-    }
-  }
-
-  translateBtn.addEventListener('click', performTranslation);
-  ttsBtn.addEventListener('click', playAudio);
-});
+    loadHistory();
+  </script>
+</body>
+</html>
