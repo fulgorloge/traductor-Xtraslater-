@@ -48,25 +48,28 @@ async function fetchTranslation(engine, targetLang, text) {
   try {
     if (engine === 'google') {
       const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodedText}`);
+      if (!res.ok) throw new Error("Google Fallback");
       const data = await res.json();
       return { text: data[0].map(item => item[0]).join(''), detectedLang: data[2] || 'auto' };
     } else {
       const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodedText}&langpair=autodetect|${targetLang}`);
+      if (!res.ok) throw new Error("MyMemory Fallback");
       const data = await res.json();
       return { text: data.responseData?.translatedText || "Sin traducción.", detectedLang: data.responseData?.detectedLanguage || 'auto' };
     }
   } catch (err) {
     if (engine === 'google') return fetchTranslation('mymemory', targetLang, text);
-    throw err;
+    throw new Error("No fue posible conectar con el servicio de traducción.");
   }
 }
 
 function saveToHistory(original, translated) {
   if (typeof chrome !== 'undefined' && chrome.storage?.local) {
     chrome.storage.local.get({ history: [] }, (res) => {
-      const history = res.history;
-      history.unshift({ original, translated, date: new Date().toISOString() });
-      chrome.storage.local.set({ history: history.slice(0, 30) });
+      const history = res.history || [];
+      const updated = history.filter(item => item.original !== original);
+      updated.unshift({ original, translated, date: new Date().toISOString() });
+      chrome.storage.local.set({ history: updated.slice(0, 30) });
     });
   }
 }
@@ -80,6 +83,7 @@ function replaceSelectedText(replacement) {
     const end = el.selectionEnd;
     el.value = el.value.substring(0, start) + replacement + el.value.substring(end);
     el.selectionStart = el.selectionEnd = start + replacement.length;
+    el.dispatchEvent(new Event('input', { bubbles: true }));
   } else if (el.isContentEditable) {
     document.execCommand('insertText', false, replacement);
   }
@@ -93,16 +97,18 @@ function createTooltip(initialData, x, y) {
   
   Object.assign(tooltip.style, {
     position: 'absolute',
-    left: `${x + window.scrollX}px`,
+    left: `${Math.min(x + window.scrollX, window.innerWidth + window.scrollX - 370)}px`,
     top: `${y + window.scrollY + 30}px`,
     zIndex: '2147483647',
     background: '#18181b',
     color: '#f4f4f5',
     padding: '12px 14px',
     borderRadius: '10px',
-    boxShadow: '0px 8px 25px rgba(0,0,0,0.5)',
+    boxShadow: '0px 8px 25px rgba(0,0,0,0.5), 0px 0px 1px rgba(255,255,255,0.15)',
     maxWidth: '360px',
+    minWidth: '260px',
     fontSize: '13px',
+    lineHeight: '1.45',
     fontFamily: 'system-ui, -apple-system, sans-serif',
     border: '1px solid #27272a',
     animation: 'xt-pop-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards'
@@ -124,6 +130,7 @@ function createTooltip(initialData, x, y) {
           <option value="fr">FR</option>
           <option value="de">DE</option>
           <option value="pt">PT</option>
+          <option value="it">IT</option>
         </select>
       </div>
       
@@ -138,7 +145,9 @@ function createTooltip(initialData, x, y) {
 
   document.body.appendChild(tooltip);
   currentTooltip = tooltip;
-  saveToHistory(activeText, initialData.text);
+  if (initialData.text && !initialData.text.startsWith("Error")) {
+    saveToHistory(activeText, initialData.text);
+  }
 
   const engineSelect = tooltip.querySelector('#xt-engine-select');
   const langSelect = tooltip.querySelector('#xt-lang-select');
