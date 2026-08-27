@@ -1,8 +1,8 @@
 let currentIcon = null;
 let currentTooltip = null;
 let activeText = "";
+let lastTargetElement = null;
 
-// Inyección de estilos globales y animaciones
 if (!document.getElementById('xtranslater-styles')) {
   const styleEl = document.createElement('style');
   styleEl.id = 'xtranslater-styles';
@@ -15,34 +15,17 @@ if (!document.getElementById('xtranslater-styles')) {
       0% { opacity: 1; transform: scale(1); }
       100% { opacity: 0; transform: scale(0.9); }
     }
-    @keyframes xt-spin {
-      100% { transform: rotate(360deg); }
-    }
+    @keyframes xt-spin { 100% { transform: rotate(360deg); } }
     .xt-spinner {
-      width: 14px;
-      height: 14px;
+      width: 14px; height: 14px;
       border: 2px solid rgba(255,255,255,0.3);
-      border-radius: 50%;
-      border-top-color: #fff;
+      border-radius: 50%; border-top-color: #fff;
       animation: xt-spin 0.6s linear infinite;
     }
-    .xt-btn-hover {
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    }
-    .xt-btn-hover:hover {
-      background: #3f3f46 !important;
-      transform: translateY(-1px);
-    }
-    .xt-btn-hover:active {
-      transform: translateY(0);
-    }
-    #xtranslater-icon {
-      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease !important;
-    }
-    #xtranslater-icon:hover {
-      transform: scale(1.15) !important;
-      background-color: #1d4ed8 !important;
-    }
+    .xt-btn-hover { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important; }
+    .xt-btn-hover:hover { background: #3f3f46 !important; transform: translateY(-1px); }
+    #xtranslater-icon { transition: transform 0.2s ease, background-color 0.2s ease !important; }
+    #xtranslater-icon:hover { transform: scale(1.15) !important; background-color: #1d4ed8 !important; }
   `;
   document.head.appendChild(styleEl);
 }
@@ -60,31 +43,48 @@ function cleanupUI() {
   window.speechSynthesis.cancel();
 }
 
-// Peticiones a motores con respuesta detallada
 async function fetchTranslation(engine, targetLang, text) {
   const encodedText = encodeURIComponent(text);
-  switch (engine) {
-    case 'google': {
+  try {
+    if (engine === 'google') {
       const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodedText}`);
       const data = await res.json();
-      const translatedText = data[0].map(item => item[0]).join('');
-      const detectedLang = data[2] || 'auto';
-      return { text: translatedText, detectedLang };
-    }
-    case 'mymemory': {
+      return { text: data[0].map(item => item[0]).join(''), detectedLang: data[2] || 'auto' };
+    } else {
       const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodedText}&langpair=autodetect|${targetLang}`);
       const data = await res.json();
-      return { 
-        text: data.responseData?.translatedText || "Sin traducción disponible.",
-        detectedLang: data.responseData?.detectedLanguage || 'auto'
-      };
+      return { text: data.responseData?.translatedText || "Sin traducción.", detectedLang: data.responseData?.detectedLanguage || 'auto' };
     }
-    default:
-      throw new Error("Motor no soportado");
+  } catch (err) {
+    if (engine === 'google') return fetchTranslation('mymemory', targetLang, text);
+    throw err;
   }
 }
 
-// Ventana emergente (Tooltip)
+function saveToHistory(original, translated) {
+  if (typeof chrome !== 'undefined' && chrome.storage?.local) {
+    chrome.storage.local.get({ history: [] }, (res) => {
+      const history = res.history;
+      history.unshift({ original, translated, date: new Date().toISOString() });
+      chrome.storage.local.set({ history: history.slice(0, 30) });
+    });
+  }
+}
+
+function replaceSelectedText(replacement) {
+  const el = lastTargetElement;
+  if (!el) return;
+
+  if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+    el.value = el.value.substring(0, start) + replacement + el.value.substring(end);
+    el.selectionStart = el.selectionEnd = start + replacement.length;
+  } else if (el.isContentEditable) {
+    document.execCommand('insertText', false, replacement);
+  }
+}
+
 function createTooltip(initialData, x, y) {
   cleanupUI();
 
@@ -100,14 +100,12 @@ function createTooltip(initialData, x, y) {
     color: '#f4f4f5',
     padding: '12px 14px',
     borderRadius: '10px',
-    boxShadow: '0px 8px 25px rgba(0,0,0,0.5), 0px 0px 1px rgba(255,255,255,0.15)',
+    boxShadow: '0px 8px 25px rgba(0,0,0,0.5)',
     maxWidth: '360px',
     fontSize: '13px',
-    lineHeight: '1.45',
     fontFamily: 'system-ui, -apple-system, sans-serif',
     border: '1px solid #27272a',
-    animation: 'xt-pop-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-    backdropFilter: 'blur(8px)'
+    animation: 'xt-pop-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards'
   });
 
   tooltip.innerHTML = `
@@ -126,11 +124,11 @@ function createTooltip(initialData, x, y) {
           <option value="fr">FR</option>
           <option value="de">DE</option>
           <option value="pt">PT</option>
-          <option value="it">IT</option>
         </select>
       </div>
       
       <div style="display: flex; gap: 4px;">
+        <button id="xt-btn-replace" class="xt-btn-hover" title="Reemplazar texto" style="background: #27272a; border: 1px solid #3f3f46; color: #fff; border-radius: 6px; padding: 3px 7px; cursor: pointer; font-size: 11px;">✏️</button>
         <button id="xt-btn-audio" class="xt-btn-hover" title="Escuchar" style="background: #27272a; border: 1px solid #3f3f46; color: #fff; border-radius: 6px; padding: 3px 7px; cursor: pointer; font-size: 11px;">🔊</button>
         <button id="xt-btn-copy" class="xt-btn-hover" title="Copiar" style="background: #27272a; border: 1px solid #3f3f46; color: #fff; border-radius: 6px; padding: 3px 7px; cursor: pointer; font-size: 11px;">📋</button>
       </div>
@@ -140,11 +138,13 @@ function createTooltip(initialData, x, y) {
 
   document.body.appendChild(tooltip);
   currentTooltip = tooltip;
+  saveToHistory(activeText, initialData.text);
 
   const engineSelect = tooltip.querySelector('#xt-engine-select');
   const langSelect = tooltip.querySelector('#xt-lang-select');
   const detectedTag = tooltip.querySelector('#xt-detected-tag');
   const resultDiv = tooltip.querySelector('#xt-result');
+  const btnReplace = tooltip.querySelector('#xt-btn-replace');
   const btnAudio = tooltip.querySelector('#xt-btn-audio');
   const btnCopy = tooltip.querySelector('#xt-btn-copy');
 
@@ -154,6 +154,7 @@ function createTooltip(initialData, x, y) {
       const res = await fetchTranslation(engineSelect.value, langSelect.value, activeText);
       resultDiv.innerText = res.text;
       detectedTag.innerText = res.detectedLang;
+      saveToHistory(activeText, res.text);
     } catch (err) {
       resultDiv.innerText = "Error en la traducción.";
     }
@@ -162,6 +163,11 @@ function createTooltip(initialData, x, y) {
 
   engineSelect.addEventListener('change', handleUpdate);
   langSelect.addEventListener('change', handleUpdate);
+
+  btnReplace.addEventListener('click', () => {
+    replaceSelectedText(resultDiv.innerText);
+    cleanupUI();
+  });
 
   btnAudio.addEventListener('click', () => {
     window.speechSynthesis.cancel();
@@ -177,7 +183,6 @@ function createTooltip(initialData, x, y) {
   });
 }
 
-// Icono flotante con loader animado
 function createTriggerIcon(x, y, selectedText) {
   cleanupUI();
   activeText = selectedText;
@@ -224,14 +229,15 @@ function createTriggerIcon(x, y, selectedText) {
       const data = await fetchTranslation('google', 'es', selectedText);
       createTooltip(data, x, y);
     } catch (err) {
-      createTooltip({ text: "Error al traducir el texto.", detectedLang: "err" }, x, y);
+      createTooltip({ text: "Error de traducción.", detectedLang: "err" }, x, y);
     }
   });
 }
 
-// Captura de selección (evita activarse dentro de inputs o editable elements si se prefiere)
 document.addEventListener('mouseup', (e) => {
   if (e.target.closest('#xtranslater-icon') || e.target.closest('#xtranslater-tooltip')) return;
+
+  lastTargetElement = e.target;
 
   setTimeout(() => {
     const selection = window.getSelection();
@@ -247,7 +253,6 @@ document.addEventListener('mouseup', (e) => {
   }, 20);
 });
 
-// Atajo Alt + T y Escape
 document.addEventListener('keydown', async (e) => {
   if (e.altKey && (e.key === 't' || e.key === 'T')) {
     const selection = window.getSelection();
@@ -266,5 +271,18 @@ document.addEventListener('keydown', async (e) => {
 document.addEventListener('mousedown', (e) => {
   if (!e.target.closest('#xtranslater-icon') && !e.target.closest('#xtranslater-tooltip')) {
     cleanupUI();
+  }
+});
+
+chrome.runtime?.onMessage?.addListener((req) => {
+  if (req.action === "translate_selection") {
+    const selection = window.getSelection();
+    const selectedText = selection.toString().trim();
+    if (selectedText.length > 0) {
+      activeText = selectedText;
+      const range = selection.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      fetchTranslation('google', 'es', selectedText).then(data => createTooltip(data, rect.right, rect.top));
+    }
   }
 });
