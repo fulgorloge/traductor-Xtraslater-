@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xtranslater - Centro de Descarga y Carga</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 350px;
+      text-align: center;
+    }
+    h2 { color: #333; margin-bottom: 20px; }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      box-sizing: border-box;
+      text-decoration: none;
+    }
+    .btn-download { background-color: #28a745; color: white; }
+    .btn-download:hover { background-color: #218838; }
+    .btn-upload { background-color: #007bff; color: white; }
+    .btn-upload:hover { background-color: #0069d9; }
+    input[type="password"], input[type="file"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .upload-section {
+      margin-top: 20px;
+      border-top: 1px solid #eee;
+      padding-top: 15px;
+    }
+    #statusMessage {
+      margin-top: 10px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2>Xtranslater Panel</h2>
+
+    <!-- Botón de Descarga Pública -->
+    <a href="/api/download" class="btn btn-download">📥 Descargar Extensión (.zip)</a>
+
+    <!-- Sección de Subida Protegida -->
+    <div class="upload-section">
+      <h3>Subir Nueva Versión</h3>
+      <form id="uploadForm">
+        <input type="password" id="passwordInput" placeholder="Contraseña de administrador" required>
+        <input type="file" id="fileInput" accept=".zip" required>
+        <button type="submit" class="btn btn-upload">📤 Subir Archivo</button>
+      </form>
+      <div id="statusMessage"></div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const password = document.getElementById('passwordInput').value;
+      const fileInput = document.getElementById('fileInput');
+      const statusMessage = document.getElementById('statusMessage');
+
+      if (!fileInput.files[0]) {
+        statusMessage.style.color = 'red';
+        statusMessage.innerText = 'Por favor selecciona un archivo .zip';
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('password', password);
+      formData.append('extensionZip', fileInput.files[0]);
+
+      statusMessage.style.color = '#333';
+      statusMessage.innerText = 'Subiendo...';
+
+      try {
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          statusMessage.style.color = 'green';
+          statusMessage.innerText = data.message;
+          document.getElementById('uploadForm').reset();
+        } else {
+          statusMessage.style.color = 'red';
+          statusMessage.innerText = data.error || 'Error al subir el archivo.';
+        }
+      } catch (error) {
+        statusMessage.style.color = 'red';
+        statusMessage.innerText = 'Error de conexión con el servidor.';
+      }
+    });
+  </script>
+
+</body>
+</html>
