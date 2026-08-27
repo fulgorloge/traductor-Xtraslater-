@@ -24,17 +24,18 @@ function createTooltip(text, x, y) {
   Object.assign(tooltip.style, {
     position: 'absolute',
     left: `${x + window.scrollX}px`,
-    top: `${y + window.scrollY + 25}px`,
-    zIndex: '999999',
-    background: '#222',
-    color: '#fff',
-    padding: '8px 12px',
+    top: `${y + window.scrollY + 30}px`,
+    zIndex: '2147483647',
+    background: '#1e1e1e',
+    color: '#ffffff',
+    padding: '10px 14px',
     borderRadius: '6px',
-    boxShadow: '0px 4px 12px rgba(0,0,0,0.3)',
-    maxWidth: '300px',
+    boxShadow: '0px 4px 15px rgba(0,0,0,0.4)',
+    maxWidth: '320px',
     fontSize: '13px',
     lineHeight: '1.4',
-    fontFamily: 'Arial, sans-serif'
+    fontFamily: 'system-ui, -apple-system, sans-serif',
+    border: '1px solid #444'
   });
 
   document.body.appendChild(tooltip);
@@ -53,19 +54,19 @@ function createTriggerIcon(x, y, selectedText) {
   Object.assign(icon.style, {
     position: 'absolute',
     left: `${x + window.scrollX}px`,
-    top: `${y + window.scrollY - 30}px`,
-    zIndex: '999999',
+    top: `${y + window.scrollY - 35}px`,
+    zIndex: '2147483647',
     background: '#007bff',
-    color: '#fff',
-    width: '26px',
-    height: '26px',
+    color: '#ffffff',
+    width: '28px',
+    height: '28px',
     borderRadius: '50%',
     display: 'flex',
     justifyContent: 'center',
     align-items: 'center',
     cursor: 'pointer',
-    boxShadow: '0px 2px 8px rgba(0,0,0,0.25)',
-    fontSize: '14px',
+    boxShadow: '0px 2px 10px rgba(0,0,0,0.3)',
+    fontSize: '15px',
     userSelect: 'none'
   });
 
@@ -94,7 +95,6 @@ function createTriggerIcon(x, y, selectedText) {
 
 // Escucha la selección de texto en la página
 document.addEventListener('mouseup', (e) => {
-  // Ignora clics dentro de la propia interfaz emergente
   if (e.target.closest('#xtranslater-icon') || e.target.closest('#xtranslater-tooltip')) {
     return;
   }
@@ -110,10 +110,10 @@ document.addEventListener('mouseup', (e) => {
     } else {
       cleanupUI();
     }
-  }, 10);
+  }, 20);
 });
 
-// Cierra ventanas al hacer clic fuera o al presionar Escape
+// Cierra ventanas al hacer clic fuera o presionar Escape
 document.addEventListener('mousedown', (e) => {
   if (!e.target.closest('#xtranslater-icon') && !e.target.closest('#xtranslater-tooltip')) {
     cleanupUI();
