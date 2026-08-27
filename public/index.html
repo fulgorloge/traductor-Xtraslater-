@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Xtranslater - Extensión de Traducción Profesional</title>
+  <title>Xtranslater - Centro de Descargas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -20,192 +20,47 @@
       --error: #ef4444;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Inter', sans-serif;
-    }
-
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 440px;
-    }
-
-    .header {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-
-    .logo-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 56px;
-      height: 56px;
-      background: linear-gradient(135deg, #2563eb, #3b82f6);
-      border-radius: 16px;
-      font-size: 28px;
-      margin-bottom: 12px;
-      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
-    }
-
-    h1 {
-      font-size: 24px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
-
-    p.subtitle {
-      color: var(--text-muted);
-      font-size: 14px;
-      margin-top: 4px;
-    }
-
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    }
-
-    .btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      padding: 12px 16px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      transition: all 0.2s ease;
-      text-decoration: none;
-    }
-
-    .btn-download {
-      background: var(--accent);
-      color: #fff;
-      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
-    }
-
-    .btn-download:hover {
-      background: var(--accent-hover);
-      transform: translateY(-1px);
-    }
-
-    .features {
-      margin: 20px 0;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .feature-item {
-      background: #27272a50;
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 10px;
-      font-size: 12px;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .divider {
-      height: 1px;
-      background: var(--card-border);
-      margin: 20px 0;
-    }
-
-    .upload-title {
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: var(--text-muted);
-    }
-
-    .input-group {
-      margin-bottom: 12px;
-    }
-
-    input[type="password"], input[type="file"] {
-      width: 100%;
-      background: #09090b;
-      border: 1px solid var(--card-border);
-      color: var(--text);
-      padding: 10px 12px;
-      border-radius: 8px;
-      font-size: 13px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    input[type="password"]:focus {
-      border-color: var(--accent);
-    }
-
-    input[type="file"]::file-selector-button {
-      background: var(--card-border);
-      color: var(--text);
-      border: none;
-      padding: 4px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-right: 8px;
-    }
-
-    .btn-upload {
-      background: #27272a;
-      color: var(--text);
-      border: 1px solid var(--card-border);
-    }
-
-    .btn-upload:hover {
-      background: #3f3f46;
-    }
-
-    #statusMessage {
-      margin-top: 12px;
-      font-size: 13px;
-      text-align: center;
-      min-height: 18px;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .container { width: 100%; max-width: 440px; }
+    .header { text-align: center; margin-bottom: 24px; }
+    .logo-badge { display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; background: linear-gradient(135deg, #2563eb, #3b82f6); border-radius: 16px; font-size: 28px; margin-bottom: 12px; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3); }
+    h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+    p.subtitle { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
+    .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 24px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
+    .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s ease; text-decoration: none; }
+    .btn-download { background: var(--accent); color: #fff; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3); }
+    .btn-download:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    .features { margin: 20px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .feature-item { background: #27272a50; border: 1px solid var(--card-border); border-radius: 8px; padding: 10px; font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+    .divider { height: 1px; background: var(--card-border); margin: 20px 0; }
+    .upload-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text-muted); }
+    .input-group { margin-bottom: 12px; }
+    input[type="password"], input[type="file"] { width: 100%; background: #09090b; border: 1px solid var(--card-border); color: var(--text); padding: 10px 12px; border-radius: 8px; font-size: 13px; outline: none; }
+    input[type="password"]:focus { border-color: var(--accent); }
+    input[type="file"]::file-selector-button { background: var(--card-border); color: var(--text); border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin-right: 8px; }
+    .btn-upload { background: #27272a; color: var(--text); border: 1px solid var(--card-border); }
+    .btn-upload:hover { background: #3f3f46; }
+    #statusMessage { margin-top: 12px; font-size: 13px; text-align: center; min-height: 18px; }
   </style>
 </head>
 <body>
-
   <div class="container">
     <div class="header">
       <div class="logo-badge">🌐</div>
       <h1>Xtranslater</h1>
-      <p class="subtitle">Traducción rápida, motores múltiples y voz en tiempo real</p>
+      <p class="subtitle">Traducción rápida, reemplazo in-place y lectura por voz</p>
     </div>
 
     <div class="card">
       <a href="/api/download" class="btn btn-download">
-        📥 Descargar Última Versión
+        📥 Descargar Última Versión (.zip)
       </a>
 
       <div class="features">
-        <div class="feature-item">⚡ Selección instantánea</div>
-        <div class="feature-item">🔊 Text-to-Speech</div>
-        <div class="feature-item">🔄 Múltiples Motores</div>
+        <div class="feature-item">⚡ Selección e ícono flotante</div>
+        <div class="feature-item">✏️ Reemplazo en inputs</div>
+        <div class="feature-item">🔊 Lectura Text-to-Speech</div>
         <div class="feature-item">⌨️ Atajo Alt + T</div>
       </div>
 
@@ -268,6 +123,5 @@
       }
     });
   </script>
-
 </body>
 </html>
